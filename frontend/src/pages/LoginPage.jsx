@@ -105,6 +105,12 @@ const LoginPage = () => {
               </Link>
             </p>
           </div>
+
+          <div className="text">
+            <p className="text-base-content/40">
+              **Open Another Page in incognito mode to see the socket connection in action.**
+            </p>
+          </div>
         </div>
       </div>
     </div>
