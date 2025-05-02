@@ -19,11 +19,10 @@ const LoginPage = () => {
 
   return (
     <div className="h-screen grid lg:grid-cols-1">
-      {/* Left Side - Form */}
       <div className="flex flex-col justify-center items-center p-6 sm:p-12">
         <div className="w-full max-w-md space-y-8">
           {/* Logo */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-8 pt-8">
             <div className="flex flex-col items-center gap-2 group">
               <div
                 className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20
@@ -104,10 +103,7 @@ const LoginPage = () => {
                 Create account
               </Link>
             </p>
-          </div>
-
-          <div className="text">
-            <p className="text-base-content/40">
+            <p className="text-base-content/40 text-xs">
               **Open Another Page in incognito mode to see the socket connection in action.**
             </p>
           </div>
