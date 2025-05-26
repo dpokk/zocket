@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
 import { create } from "zustand";
-import { axiosInstance } from "../lib/axios";
+import api from "../lib/api";
 import { useAuthStore } from "./useAuthStore";
 
 export const useChatStore = create((set, get) => ({
@@ -13,10 +13,10 @@ export const useChatStore = create((set, get) => ({
       getUsers: async () => {
         set({ isUsersLoading: true });
         try {
-          const res = await axiosInstance.get("/messages/users");
+          const res = await api.get("/api/messages/users");
           set({ users: res.data });
         } catch (error) {
-          toast.error(error.response.data.message);
+          toast.error(error.response?.data?.message || "Failed to fetch users");
         } finally {
           set({ isUsersLoading: false });
         }
@@ -25,22 +25,22 @@ export const useChatStore = create((set, get) => ({
       getMessages: async (userId) => {
         set({ isMessagesLoading: true });
         try {
-          const res = await axiosInstance.get(`/messages/${userId}`);
+          const res = await api.get(`/api/messages/${userId}`);
           set({ messages: res.data });
         } catch (error) {
-          toast.error(error.response.data.message);
+          toast.error(error.response?.data?.message || "Failed to fetch messages");
         } finally {
           set({ isMessagesLoading: false });
         }
       },
 
       sendMessage: async (messageData) => {
-          const { selectedUser, messages }  = get()
+          const { selectedUser, messages }  = get();
           try {
-            const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
+            const res = await api.post(`/api/messages/send/${selectedUser._id}`, messageData);
             set({messages: [...messages, res.data]});
           } catch (error) {
-             toast.error(error.response.data.message);
+             toast.error(error.response?.data?.message || "Failed to send message");
           }
       },
 
@@ -49,13 +49,11 @@ export const useChatStore = create((set, get) => ({
         if (!selectedUser) return;
     
         const socket = useAuthStore.getState().socket;
-
-
+        if (!socket) return;
     
         socket.on("newMessage", (newMessage) => {
-          //prevents messages from being saved in third person's chat if person1 and 2 are texting.
-          const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id; //if false
-          if (!isMessageSentFromSelectedUser) return; // then this will be true, and it will just return without adding new message
+          const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
+          if (!isMessageSentFromSelectedUser) return;
     
           set({
             messages: [...get().messages, newMessage],
@@ -65,7 +63,9 @@ export const useChatStore = create((set, get) => ({
     
       unsubscribeFromMessages: () => {
         const socket = useAuthStore.getState().socket;
-        socket.off("newMessage");
+        if (socket) {
+          socket.off("newMessage");
+        }
       },
 
       setSelectedUser: (selectedUser) => set({ selectedUser }),
