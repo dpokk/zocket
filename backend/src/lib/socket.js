@@ -17,6 +17,7 @@ const io = new Server(server, {
         origin: allowedOrigins,
         credentials: true
     },
+    path: '/socket.io/'
 });
 
 export function getReceiverSocketId(userId) {
