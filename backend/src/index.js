@@ -10,7 +10,7 @@ import { app, server } from "./lib/socket.js";
 
 dotenv.config();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 const __dirname = path.resolve();
 
 app.use(express.json({ limit: "10mb" }));
@@ -24,12 +24,19 @@ app.use(cors({
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
+// Only serve static files in production and if the frontend build exists
 if(process.env.NODE_ENV === "production"){
-    app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-    app.get("*", (req,res) => {
-        res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
-    });
+    try {
+        const frontendPath = path.join(__dirname, "../frontend/dist");
+        if (require('fs').existsSync(frontendPath)) {
+            app.use(express.static(frontendPath));
+            app.get("*", (req, res) => {
+                res.sendFile(path.join(frontendPath, "index.html"));
+            });
+        }
+    } catch (error) {
+        console.log("Frontend build not found, running in API-only mode");
+    }
 }
 
 //replaced app with a server. Lays on top of the app and waits for communication
