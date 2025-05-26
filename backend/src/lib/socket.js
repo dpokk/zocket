@@ -5,12 +5,11 @@ import express from "express";
 const app = express();
 const server = http.createServer(app);
 
-const allowedOrigins = [process.env.FRONTEND_URL || "http://localhost:5173"];
-
-// Add a wildcard for Vercel preview deployments
-if (process.env.NODE_ENV === "production") {
-    allowedOrigins.push("https://*-dpokk-projects.vercel.app");
-}
+const allowedOrigins = [
+    process.env.FRONTEND_URL || "http://localhost:5173",
+    "https://zocket-git-main-dpokk-projects.vercel.app",
+    "https://zocket.vercel.app"
+];
 
 const io = new Server(server, {
     cors: {
